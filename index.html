@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Happy 1500 Hours — Celebration</title>
+<title>Co-Pilot Ryu 1500 Hours Celebration</title>
 <style>
 :root{
   --bg1:#fff6fb; --bg2:#e3f2ff; --bg3:#cde7ff;
@@ -56,18 +56,6 @@ body{background:linear-gradient(180deg,var(--bg1),var(--bg2) 70%,var(--bg3));}
   border-radius:50%;animation:flicker .12s infinite alternate;
 }
 @keyframes flicker{from{transform:translateX(-50%) rotate(-3deg);}to{transform:translateX(-50%) rotate(3deg);}}
-button{appearance:none;border:0;background:#fff;border-radius:12px;padding:10px 14px;font-weight:800;box-shadow:var(--shadow);cursor:pointer}
-button:active{transform:scale(.97);}
-.smoke{position:absolute;left:50%;bottom:156px;transform:translateX(-50%);pointer-events:none}
-.smoke span{
-  position:absolute;width:10px;height:10px;border-radius:50%;background:rgba(180,180,180,.5);
-  filter:blur(1px);opacity:0;animation:puff 1.2s ease-out forwards;
-}
-@keyframes puff{
-  0%{transform:translate(-4px,4px) scale(.6);opacity:0;}
-  20%{opacity:.8;}
-  100%{transform:translate(-4px,-80px) scale(1.8);opacity:0;}
-}
 
 /* Party Scene */
 .party{position:fixed;inset:0;opacity:0;pointer-events:none;transition:opacity .9s ease}
@@ -79,7 +67,7 @@ button:active{transform:scale(.97);}
 }
 @keyframes drift{from{transform:translateX(-220px)}to{transform:translateX(120vw)}}
 .center-wrap{
-  position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);text-align:center;user-select:none;
+  position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);text-align:center;user-select:none;
 }
 .date{
   font-family:"Segoe Script","Snell Roundhand","Apple Chancery","Comic Sans MS",cursive;
@@ -90,17 +78,46 @@ button:active{transform:scale(.97);}
   margin-top:8px;font-weight:900;font-size:clamp(18px,5vw,44px);
   color:#7a2c9f;text-shadow:0 2px 0 #fff;
 }
+.tap-hint{
+  position:absolute;bottom:12%;left:50%;transform:translateX(-50%);
+  font-size:clamp(16px,4vw,24px);font-weight:700;
+  color:#ff2e93;text-shadow:0 0 8px #fff;
+  animation:hintBlink 1.2s ease-in-out infinite;
+}
+@keyframes hintBlink{
+  0%,100%{opacity:1;transform:translateX(-50%) scale(1);}
+  50%{opacity:0.4;transform:translateX(-50%) scale(1.05);}
+}
 
-/* Plane */
+/* Plane & Vertical Banner */
 .plane-wrap{position:absolute;left:-120px;top:14%;filter:drop-shadow(0 8px 10px rgba(0,0,0,.18))}
 .plane-hit{position:absolute;inset:-28px;cursor:pointer}
 .plane{font-size:clamp(70px,12vw,120px)}
+
+/* 🎀 세로 현수막 — 비행기와 살짝 떨어지게 조정 */
 .banner{
-  position:absolute;left:-520px;top:22px;white-space:nowrap;padding:10px 20px;border-radius:14px;
-  background:linear-gradient(90deg,#fff,#fff0f8);border:2px dashed #ff8bd7;color:#ff2e93;font-weight:900;
-  text-shadow:0 0 8px #ffd3f0,0 0 12px #ffc7ea;animation:wave 2s ease-in-out infinite;
+  position:absolute;
+  left:50px; /* ← 비행기와의 간격 */
+  top:120px; /* ← 살짝 더 아래로 */
+  writing-mode:vertical-rl;
+  text-orientation:mixed;
+  background:linear-gradient(180deg,#fff,#fff0f8);
+  border:2px dashed #ff8bd7;
+  color:#ff2e93;
+  font-weight:900;
+  font-size:clamp(14px,3.5vw,24px);
+  padding:24px 12px;
+  border-radius:20px;
+  text-shadow:0 0 8px #ffd3f0,0 0 12px #ffc7ea;
+  transform-origin:top center;
+  animation:bannerWave 2.8s ease-in-out infinite alternate;
+  box-shadow:0 6px 12px rgba(0,0,0,0.12);
 }
-@keyframes wave{0%,100%{transform:rotate(2deg)}50%{transform:rotate(-2deg)}}
+@keyframes bannerWave{
+  0%{transform:rotate(3deg) translateY(0);}
+  50%{transform:rotate(-3deg) translateY(6px);}
+  100%{transform:rotate(3deg) translateY(0);}
+}
 canvas#fx{position:absolute;inset:0;pointer-events:none}
 .hide{display:none!important}
 </style>
@@ -128,11 +145,12 @@ canvas#fx{position:absolute;inset:0;pointer-events:none}
     <div class="date">2025.10.20</div>
     <div class="headline">Happy 1500 hours 🎉</div>
   </div>
+  <div class="tap-hint">✈️ 비행기를 클릭하세요!</div>
   <canvas id="fx"></canvas>
   <div class="plane-wrap" id="planeWrap">
     <div class="plane-hit" id="planeHit"></div>
     <div class="plane" id="plane">✈️</div>
-    <div class="banner">Co-Pilot Ryu — Congratulations!</div>
+    <div class="banner">Co-Pilot Ryu<br>Congratulations!</div>
   </div>
 </section>
 
@@ -144,12 +162,10 @@ canvas#fx{position:absolute;inset:0;pointer-events:none}
   const flame=document.getElementById('flame');
   const smokeBox=document.getElementById('smoke');
 
-  // 📱 모바일 터치 지원
   function addTapEvent(el,fn){
-    ['pointerdown','touchstart','click'].forEach(evt=>{
+    ['pointerdown','touchend','click'].forEach(evt=>{
       el.addEventListener(evt,e=>{
-        e.preventDefault();
-        fn(e);
+        e.preventDefault(); fn(e);
       },{passive:false});
     });
   }
@@ -174,10 +190,8 @@ canvas#fx{position:absolute;inset:0;pointer-events:none}
       },900);
     },400);
   }
-
   addTapEvent(cakeBtn,blowCandle);
 
-  /* 폭죽 */
   const cvs=document.getElementById('fx');
   const ctx=cvs.getContext('2d');
   let W,H,DPR;
@@ -214,7 +228,6 @@ canvas#fx{position:absolute;inset:0;pointer-events:none}
     setTimeout(()=>burst(innerWidth*0.3,innerHeight*0.25,140),500);
   }
 
-  /* 비행기 */
   const planeWrap=document.getElementById('planeWrap');
   const plane=document.getElementById('plane');
   const planeHit=document.getElementById('planeHit');
@@ -234,7 +247,7 @@ canvas#fx{position:absolute;inset:0;pointer-events:none}
     const t=(performance.now()-t0)/1000;
     const speed=160;
     const x=((t*speed)%(innerWidth+320))-160;
-    const y=innerHeight*0.14+Math.sin(t*1.8)*innerHeight*0.07;
+    const y=innerHeight*0.12+Math.sin(t*1.5)*innerHeight*0.05;
     planeWrap.style.transform=`translate(${x}px,${y}px) rotate(${Math.sin(t*2)*3}deg)`;
     requestAnimationFrame(()=>animatePlane(t0));
   }
@@ -245,7 +258,7 @@ canvas#fx{position:absolute;inset:0;pointer-events:none}
     burst(r.left+r.width*0.7,r.top+r.height*0.4,220);
     plane.animate([{transform:'scale(1)'},{transform:'scale(1.15) rotate(8deg)'},{transform:'scale(1)'}],{duration:360,easing:'ease-out'});
   }
-  ['pointerdown','touchstart','click'].forEach(evt=>{
+  ['pointerdown','touchend','click'].forEach(evt=>{
     planeHit.addEventListener(evt,boomAtPlane,{passive:true});
   });
 })();
